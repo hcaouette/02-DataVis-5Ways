@@ -1,0 +1,219 @@
+<head>
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_package/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_package/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_package/favicon-16x16.png">
+    <link rel="manifest" href="favicon_package/site.webmanifest">
+    <link rel="mask-icon" href="favicon_package/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+  
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+  
+    <style>
+      div {
+        border:3px solid purple;
+        width: fit-content;
+        height: fit-content;
+        overflow: hidden;
+        float: left;
+      }
+      svg{
+        /* border:3px solid orange; */
+      }
+      p{
+        padding:0px;
+        margin:1px;
+      }
+      #legend{
+        
+      }
+      #data_panel{
+          height: 220px;
+          min-width: 150px;
+          width: fit-content;
+          float:left;
+      }
+      
+      svg.cartesian {
+        display:flex;
+      }
+      /* Flip the vertical axis in <g> to emulate cartesian. */
+      svg.cartesian{
+        transform: scaleY(-1);
+      }
+      /* Re-flip all <text> element descendants to their original side up. */
+      svg.cartesian{
+        transform: scaleY(-1);
+      }
+  
+    </style>
+  
+</head>
+  
+<script>
+    //globals
+    var data
+    var chart_box
+    var border_offset=5
+    var width = 1000
+    var height = 600
+    var xscale = d3.scaleLinear()
+        .domain([1450, 5050])//the provided x-scale
+        .range([0, width]);
+    var yscale = d3.scaleLinear()
+        .domain([8, 50])//the provded y-scale
+        .range([0, height]);
+    var man_list_of_circles={'ford':[], 'honda':[], 'toyota':[], 'bmw':[], 'mercedes':[]}
+    var man_list = ['ford','honda','toyota','bmw','mercedes']
+    // var circles
+
+    //start asynch
+    const csv_prom = d3.csv("cars-sample.csv");
+    csv_prom.then( function(d){  
+        // data = d
+        load_components(d)
+    });
+  
+    function load_components(data){
+        load_chart_box(data)
+        load_legend(data)
+    }
+
+
+    function load_legend(data){
+        var border_offset=5
+        legend = d3.select("#legend")
+            .selectAll("p")
+            .data(man_list)
+            .enter()
+            .append("p")
+            .text(function(d){
+                return d;
+            })
+            .attr("id", function(d,i){
+                return d;
+            })
+            .on('mouseover',function(e, d){
+                d3.select('#'+d).style('color',function(d){
+                    switch(d){
+                        case 'bmw': return 'red';break;
+                        case 'ford': return 'olivedrab';break;
+                        case 'honda': return 'mediumseagreen';break;
+                        case 'mercedes': return 'lightskyblue';break;
+                        case 'toyota': return 'purple';break;
+                        default: return "gold";break;
+                    }  
+                })
+                name=d
+                chart_box.selectAll('circle')
+                    .attr('fill-opacity',function(d){
+                        if(d.Manufacturer == name){
+                            return "100%";
+                        }else{
+                            return "50%";
+                        }
+                    });
+            })
+            .on('mouseout',function(d){
+                chart_box.selectAll('circle')
+                    .attr('fill-opacity',"50%");
+                d3.select('#'+d).style('color','black');
+            });
+    }
+
+
+
+    function load_chart_box(data){
+        chart_box = d3.select("#chart_box").append("svg")
+          .attr('class','cartesian')
+          .attr('width',width)
+          .attr('height',height);
+      
+        var poly = [{"x":0, "y":0},
+          {"x":width,"y":0},
+          {"x":width,"y":height},
+          {"x":0,"y":height}];
+        chart_box.selectAll("polygon")
+            .data([poly])
+            .enter().append("polygon")
+            .attr("points",function(d) { 
+                return d.map(function(d) {
+                return [d.x,d.y].join(",");
+                }).join(" ");
+            })
+            .attr('fill','#D3D3D3');
+
+        //column major gridlines
+        for(c_ma=2000; c_ma<5100; c_ma+=1000){
+            chart_box.append("line")
+                .attr('x1',xscale( c_ma )).attr('y1',0)
+                .attr('x2',xscale( c_ma )).attr('y2',height)
+                .attr('stroke','white').attr('stroke-width', 3);
+        }
+        //column minor gridlines
+        for (c_mi=1500; c_mi<5100; c_mi+=1000){
+            chart_box.append("line")
+            .attr('x1',xscale( c_mi )).attr('y1',0)
+            .attr('x2',xscale( c_mi )).attr('y2',height)
+            .attr('stroke','white').attr('stroke-width', 1);
+        }
+        //row major gridlines
+        for (r_ma=10; r_ma<50; r_ma+=10){
+            chart_box.append("line")
+                .attr('x1',0).attr('y1',yscale( r_ma ))
+                .attr('x2',width).attr('y2',yscale( r_ma ))
+                .attr('stroke','white').attr('stroke-width', 3);
+        }
+        //row minor gridlines
+        for (r_mi=5; r_mi<50; r_mi+=10){
+            chart_box.append("line")
+                .attr('x1',0).attr('y1',yscale( r_mi ))
+                .attr('x2',width).attr('y2',yscale( r_mi ))
+                .attr('stroke','white').attr('stroke-width', 1);
+        }
+        
+        circles = chart_box.selectAll('circle')
+            .data(data)
+            .enter()
+            .append('circle')
+            .attr('cx',function(d,i){ return xscale(d.Weight);})
+            .attr('cy',function(d){ return yscale(d.MPG);})
+            .style('fill',function(d){
+                switch(d.Manufacturer){
+                case 'bmw': return 'red';break;
+                case 'ford': return 'olivedrab';break;
+                case 'honda': return 'mediumseagreen';break;
+                case 'mercedes': return 'lightskyblue';break;
+                case 'toyota': return 'purple';break;
+                default: return "gold";break;
+                }
+            })
+            .attr('fill-opacity',"50%")
+            .attr('r',function(d){
+                return d.Weight*.005;
+            })
+            .on('mouseover',function(e, d){
+                // console.log("weight:",d.Weight,"mpg:",d.MPG);
+                d3.select("#data_panel").selectAll('p').remove()
+                for (const element in d){
+                    d3.select('#data_panel')
+                        .append("p")
+                        .text( ()=>{
+                            console.log(element+': '+d[element]);
+                            return (element+': '+d[element]) ;
+                        })
+                }
+            });
+            // .on('mouseout',function(e, d){
+            //     d3.select("#data_panel").selectAll('p').remove()
+            // });
+    }
+  
+</script>
+  
+<body>
+  <div id="chart_box"></div>
+  <div id="legend"></div>
+  <div id="data_panel"></div>
+  <!-- <svg id="chart_body"></svg> -->
+</body>

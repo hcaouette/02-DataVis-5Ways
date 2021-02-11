@@ -33,35 +33,33 @@ Be sure to note where these deviate.
 
 Improvements are also welcome as part of Technical and Design achievements.
 
-Libraries, Tools, Languages
----
 
-You are required to use 5 different tools or libraries.
-Of the 5 tools, you must use at least 3 libraries (libraries require code of some kind).
-This could be `Python, R, Javascript`, or `Java, Javascript, Matlab` or any other combination.
-Dedicated tools (i.e. Excel) do not count towards the language requirement.
+#### template
+![ggplot2](img/ggplot2.png)
+#### d3
+![cars_d3](img/cars_d3.png)
+#### Python - matplotlib
+![cars_matplot](img/cars_matplot.png)
+#### R- ggplot2
+![cars-Rggplot](img/cars-Rggplot.png)
+#### Excel
+![cars_xlsx](img/cars_xlsx.png)
+#### PowerBI
+![cars_pbi](img/cars_pbi.png)
 
-Otherwise, you should seek tools and libraries to fill out your 5.
 
-Below are a few ideas. Do not limit yourself to this list!
-Some may be difficult choices, like Matlab or SPSS, which require large installations, licenses, and occasionally difficult UIs.
+## Technical Achievements
 
-I have marked a few that are strongly suggested.
+## Design Achievements
 
-- R + ggplot2 `<- definitely worth trying`
-- Excel
-- d3 `<- since the rest of the class uses this, we're requiring it`
-- Matplotlib
-<!-- - three.js `<- well, it's a 3d library. not really recommended, but could be "interesting"` -->
-<!-- - p5js `<- good for playing around. not really a chart lib` -->
-<!-- - Tableau -->
-<!-- - Java 2d -->
-<!-- - GNUplot -->
-<!-- - Vega-lite <- `<- recently much better. look for the high level js implementations` -->
-<!-- - Flourish <- `<- popular last year` -->
-- PowerBI
-<!-- - SPSS -->
 
+### credits
+- https://bl.ocks.org/d3noob/180287b6623496dbb5ac4b048813af52
+-
+
+
+
+```
 You may write everything from scratch, or start with demo programs from books or the web. 
 If you do start with code that you found, please identify the source of the code in your README and, most importantly, make non-trivial changes to the code to make it your own so you really learn what you're doing. 
 
@@ -115,6 +113,7 @@ Make sure you include the files necessary to reproduce your plots.
 You should structure these in folders if helpful.
 We will choose some at random to run and test.
 
+
 **NOTE: THE BELOW IS A SAMPLE ENTRY TO GET YOU STARTED ON YOUR README. YOU MAY DELETE THE ABOVE.**
 
 # R + ggplot2 + R Markdown
@@ -127,18 +126,8 @@ To visualized the cars dataset, I made use of ggplot2's `geom_point()` layer, wi
 
 While it takes time to find the correct documentation, these functions made the effort creating this chart minimal.
 
-![ggplot2](img/ggplot2.png)
 
 # d3...
 
 (And so on...)
-
-
-## Technical Achievements
-
-## Design Achievements
-
-
-### credits
-- https://bl.ocks.org/d3noob/180287b6623496dbb5ac4b048813af52
--
+```

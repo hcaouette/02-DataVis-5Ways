@@ -1,0 +1,201 @@
+<head>
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_package/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_package/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_package/favicon-16x16.png">
+    <link rel="manifest" href="favicon_package/site.webmanifest">
+    <link rel="mask-icon" href="favicon_package/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+  
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+  
+    <style>
+      div {
+        border:3px solid purple;
+        width: fit-content;
+        height: fit-content;
+        overflow: hidden;
+        float: left;
+      }
+      svg{
+        /* border:3px solid orange; */
+      }
+      p{
+        padding:0px;
+        margin:1px;
+      }
+      #legend{
+        
+      }
+      #data_panel{
+          height: 220px;
+          min-width: 150px;
+          width: fit-content;
+          float:left;
+      }
+
+      div.tooltip {
+            position: absolute;
+            text-align: center;
+            min-width: 60px;
+            width: fit-content;
+            min-height: 28px;
+            height: fit-content;
+            padding: 2px;
+            font: 12px sans-serif;
+            /* background: lightsteelblue; */
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }   
+      
+      svg.cartesian {
+        display:flex;
+      }
+      /* Flip the vertical axis in <g> to emulate cartesian. */
+      svg.cartesian{
+        transform: scaleY(-1);
+      }
+      /* Re-flip all <text> element descendants to their original side up. */
+      svg.cartesian{
+        transform: scaleY(-1);
+      }
+  
+    </style>
+  
+</head>
+  
+<script>
+    //globals
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+    //start asynch
+    const csv_prom = d3.csv("cars-sample.csv");
+    csv_prom.then( function(d){  
+        data = d
+        load_components(d)
+    });
+  
+    function load_components(data){
+        load_graph(data)
+    }
+
+    function load_graph(data){
+        // setup x 
+        var xValue = function(d) { return d.Weight;}, // data -> value
+            xScale = d3.scaleLinear().range([0, width]), // value -> display
+            xMap = function(d) { return xScale(xValue(d));}, // data -> display
+            xAxis = d3.axisBottom(xScale);
+        // setup y
+        var yValue = function(d) { return d.MPG;}, // data -> value
+            yScale = d3.scaleLinear().range([height, 0]), // value -> display
+            yMap = function(d) { return yScale(yValue(d));}, // data -> display
+            yAxis = d3.axisLeft(yScale);
+        // setup fill color
+        var cValue = function(d) { return d.Manufacturer;},
+        color = d3.scaleOrdinal(['#6e750e','#c20078','#e50000','#15b01a','#75bbfd']);
+        // add the graph canvas to the body of the webpage
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .style("background-color","#D3D3D3")
+        .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        // add the tooltip area to the webpage
+        var tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+        
+        // don't want dots overlapping axis, so add in buffer to data domain
+        // xScale.domain([d3.min(data, xValue)-1, d3.max(data, xValue)+1]);
+        // yScale.domain([d3.min(data, yValue)-1, d3.max(data, yValue)+1]);
+        xScale.domain([1450, 5000]);
+        yScale.domain([9, 46]);
+
+        
+
+        // x-axis
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+            .append("text")
+            .attr("class", "label")
+            .attr("x", width)
+            .attr("y", -6)
+            .style("text-anchor", "end")
+            .text("Weight");
+
+        // y-axis
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+            .append("text")
+            .attr("class", "label")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("MPG");
+
+        // draw dots
+        svg.selectAll(".dot")
+            .data(data)
+            .enter().append("circle")
+            .attr("class", "dot")
+            // .attr("r", 3.5)
+            .attr('r',function(d){return 0.005*d.Weight;})
+            // .attr("cx", xMap)
+            .attr('cx',function(d){ return xScale(d.Weight);})
+            // .attr("cy", yMap)
+            .attr('cy',function(d){ return yScale(d.MPG);})
+            .style("fill", function(d) { return color(cValue(d));})
+            .style("opacity", .5)
+            .on("mouseover", function(e,d) {
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .5);
+                // console.log(d);
+                tooltip.html(d.Car + "<br/> (" + xValue(d=d) + ", " + yValue(d=d) + ")")
+                    .style("left", (e.pageX) + "px")
+                    .style("top", (e.pageY) + "px")
+                    .style("background-color", color(cValue(d)));
+                // console.log(e.pageX,",",e.pageY);
+            })
+            .on("mouseout", function(d) {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
+
+        // draw legend
+        var legend = svg.selectAll(".legend")
+            .data(color.domain())
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+        // draw legend colored rectangles
+        legend.append("rect")
+            .attr("x", width - 18)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", color);
+
+        // draw legend text
+        legend.append("text")
+            .attr("x", width - 24)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(function(d) { return d;});
+    }
+
+   
+  
+</script>
+  
+<body>
+</body>

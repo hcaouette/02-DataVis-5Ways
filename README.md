@@ -135,8 +135,10 @@ While it takes time to find the correct documentation, these functions made the 
 
 
 ## Technical Achievements
-- **Proved P=NP**: Using a combination of...
-- **Solved AI Forever**: ...
 
-### Design Achievements
-- **Re-vamped Apple's Design Philosophy**: As demonstrated in my colorscheme...
+## Design Achievements
+
+
+### credits
+- https://bl.ocks.org/d3noob/180287b6623496dbb5ac4b048813af52
+-

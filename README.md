@@ -3,6 +3,10 @@
 Assignment 2 - Data Visualization, 5 Ways  
 ===
 
+# REPO DEPRECATED
+See ![Data Vis 5 Ways (1)](https://github.com/hcaouette/02-DataVis-5Ways-1) For forked assignment version
+
+
 Now that you have successfully made a "visualization" of shapes and lines using d3, your next assignment is to successfully make a *actual visualization*... 5 times. 
 
 The goal of this project is to gain experience with as many data visualization libraries, languages, and tools as possible.
